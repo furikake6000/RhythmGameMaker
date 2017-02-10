@@ -15,8 +15,10 @@ public class ClickTapRelay : MonoBehaviour {
         if (Input.GetMouseButtonDown(0))
         {
             //クリックの当たり判定情報を取得
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit2D[] hits = Physics2D.RaycastAll(ray.origin, ray.direction);
+            Vector3 mousePos = Input.mousePosition;
+            mousePos.z = 0.0f;
+            Vector3 mouseWPos = Camera.main.ScreenToWorldPoint(mousePos);
+            RaycastHit2D[] hits = Physics2D.RaycastAll(mouseWPos, Vector2.zero); //マウスの位置から射出される前向きベクトル
 
             //接触するコライダーが一つ以上あるか確認
             if(hits.Length != 0)

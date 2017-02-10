@@ -20,8 +20,6 @@ public class Key : MonoBehaviour {
 
     #region private params
 
-    Collider2D col;  //当たり判定事前取得用変数
-
     #endregion
 
     #region public functions
@@ -41,7 +39,7 @@ public class Key : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
-        col = gameObject.GetComponent<Collider2D>();
+
 	}
 	
 	// Update is called once per frame
@@ -60,7 +58,13 @@ public class Key : MonoBehaviour {
     // Inputイベントが発生したら（キータッチ、タップ、クリックのいずれか有効なものが行われたら）
     void KeyPressed()
     {
+        //自分と同じ位置までエフェクトを移動
+        TouchEffect.transform.position = transform.position;
+        //エフェクトをひとつ発する
+        TouchEffect.Emit(1);
 
+        //Debugメッセージ
+        Debug.Log("Key(" + gameObject.name + ") has pressed!\n");
     }
 
     #endregion
