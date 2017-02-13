@@ -8,11 +8,11 @@ public class Note : MonoBehaviour {
     #region editor params
 
     public Vector3 startPos, endPos;    //始点終点
-    public AnimationCurve xMoveCurve, yMoveCurve;   //X、Y各座標において移動するカーブ
-    public float startSize, endSize;    //開始時サイズ、終了時サイズ
-    public AnimationCurve sizeCurve;    //サイズ変更カーブ
-    public Timing endTime;  //ゴールに着くタイミング
-    public float existTime; //存在している時間（単位はMusicalTime）
+    //public AnimationCurve xMoveCurve, yMoveCurve;   //X、Y各座標において移動するカーブ
+    public float startSize = 1.0f, endSize = 1.0f;    //開始時サイズ、終了時サイズ
+    //public AnimationCurve sizeCurve;    //サイズ変更カーブ
+    public float startTime, endTime; //始点・終点に着く時間（単位はMusicalTime）
+    public float destroyPostponedTime = 4.0f;
 
     #endregion
 
@@ -25,14 +25,20 @@ public class Note : MonoBehaviour {
 	void Update () {
         //現在の位置を0～1のfloatで取得
         float justTimePos;
-        justTimePos = 1.0f + (Music.MusicalTimeFrom(endTime) / existTime);
+        justTimePos = (Music.MusicalTime - startTime) / (endTime - startTime);
         //座標移動
         Vector3 newPos = Vector3.zero;
-        newPos.x = MyMathf.Lerp(startPos.x, endPos.x, xMoveCurve.Evaluate(justTimePos));
-        newPos.y = MyMathf.Lerp(startPos.y, endPos.y, yMoveCurve.Evaluate(justTimePos));
+        newPos.x = MyMathf.LerpUnlimited(startPos.x, endPos.x, justTimePos);
+        newPos.y = MyMathf.LerpUnlimited(startPos.y, endPos.y, justTimePos);
         transform.position = newPos;
         //サイズ変更
-        float newSize = MyMathf.Lerp(startSize, endSize, sizeCurve.Evaluate(justTimePos));
+        float newSize = MyMathf.LerpUnlimited(startSize, endSize, justTimePos);
         transform.localScale = Vector3.one * newSize;
+
+        //消滅
+        if(Music.MusicalTime > endTime + destroyPostponedTime)
+        {
+            Destroy(gameObject);
+        }
     }
 }

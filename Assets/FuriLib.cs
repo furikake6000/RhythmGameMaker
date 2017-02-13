@@ -13,7 +13,7 @@ namespace FuriLib
         /// <param name="b">The end value.</param>
         /// <param name="t">The interpolation value between the two floats.</param>
         /// <returns></returns>
-        public static float Lerp(float a, float b, float t)
+        public static float LerpUnlimited(float a, float b, float t)
         {
             return (a + (b - a) * t);
         }

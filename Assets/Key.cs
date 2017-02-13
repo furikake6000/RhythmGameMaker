@@ -52,7 +52,11 @@ public class Key : MonoBehaviour {
     /// コード読み込み時に呼び出されるStart関数
     /// </summary>
     void Start () {
-
+        if(NotePrefab.GetComponent<Note>() == null)
+        {
+            //Noteコンポーネントつけ忘れ時の警告機能１
+            Debug.LogWarning("Warning: NotePrefab does not have Note component.");
+        }
 	}
 
     /// <summary>
@@ -68,6 +72,13 @@ public class Key : MonoBehaviour {
         }
         if (isAppliedKeyPushed) KeyPressed();
 
+        //Notes出力関係
+        if (Music.IsJustChangedBar())
+        {
+            Timing newTime = new Timing(1);
+            newTime.Add(Music.Just, Music.CurrentSection);
+            CreateNote(newTime);
+        }
 	}
 
     /// <summary>
@@ -87,6 +98,21 @@ public class Key : MonoBehaviour {
     /// <summary>
     /// ノーツを生成する
     /// </summary>
+    void CreateNote(Timing beatTime)
+    {
+        GameObject newNoteObject = GameObject.Instantiate(NotePrefab);
+        Note newNote = newNoteObject.GetComponent<Note>();
+        if (newNote == null)
+        {
+            //もしNotePrefabにNoteコンポーネントがついていなかった時の措置
+            newNote = newNoteObject.AddComponent<Note>();
+        }
+        newNote.startPos = NoteStartPos;
+        newNote.endPos = transform.position;
+        newNote.startTime = Music.MusicalTime;  //開始時刻は現在時刻
+        newNote.endTime = beatTime.GetMusicalTime(Music.CurrentSection);
+        //StartSize、EndSizeはPrefabに紐付けられた情報のまま
+    }
 
     #endregion
 
