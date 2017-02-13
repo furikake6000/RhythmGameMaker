@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using FuriLib;
 
 public class Note : MonoBehaviour {
 
@@ -24,13 +25,14 @@ public class Note : MonoBehaviour {
 	void Update () {
         //現在の位置を0～1のfloatで取得
         float justTimePos;
-        justTimePos = 1.0f - (Music.MusicalTimeFrom(endTime) / existTime);
+        justTimePos = 1.0f + (Music.MusicalTimeFrom(endTime) / existTime);
         //座標移動
         Vector3 newPos = Vector3.zero;
-        newPos.x = Mathf.Lerp(startPos.x, endPos.x, xMoveCurve.Evaluate(justTimePos));
-        newPos.y = Mathf.Lerp(startPos.y, endPos.y, yMoveCurve.Evaluate(justTimePos));
+        newPos.x = MyMathf.Lerp(startPos.x, endPos.x, xMoveCurve.Evaluate(justTimePos));
+        newPos.y = MyMathf.Lerp(startPos.y, endPos.y, yMoveCurve.Evaluate(justTimePos));
         transform.position = newPos;
         //サイズ変更
-        transform.localScale = Vector3.one * sizeCurve.Evaluate(justTimePos);
+        float newSize = MyMathf.Lerp(startSize, endSize, sizeCurve.Evaluate(justTimePos));
+        transform.localScale = Vector3.one * newSize;
     }
 }
