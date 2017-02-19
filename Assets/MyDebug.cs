@@ -22,6 +22,7 @@ public class MyDebug : MonoBehaviour {
         //AudioSourceの再生位置
         newDebugText += "再生時間 " + Music.MusicalTime + "\n";
         newDebugText += "再生時間 " + Music.MusicalTimeBar + "\n";
+        newDebugText += "TimeSample" + Music.TimeSamples + "\n";
         //BPM90
         newDebugText += Music.Just.ToString() + "\n";
 

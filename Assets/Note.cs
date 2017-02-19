@@ -11,8 +11,8 @@ public class Note : MonoBehaviour {
     //public AnimationCurve xMoveCurve, yMoveCurve;   //X、Y各座標において移動するカーブ
     public float startSize = 1.0f, endSize = 1.0f;    //開始時サイズ、終了時サイズ
     //public AnimationCurve sizeCurve;    //サイズ変更カーブ
-    public float startTime, endTime; //始点・終点に着く時間（単位はMusicalTime）
-    public float destroyPostponedTime = 4.0f;
+    public int startSample, endSample; //始点・終点に着く時間（単位はサンプル数）
+    public float destroyPostponedTime = 4.0f;   //終点についてから消えるまでの時間（単位は秒）
 
     #endregion
 
@@ -25,7 +25,7 @@ public class Note : MonoBehaviour {
 	void Update () {
         //現在の位置を0～1のfloatで取得
         float justTimePos;
-        justTimePos = (Music.MusicalTime - startTime) / (endTime - startTime);
+        justTimePos = (float)(Music.TimeSamples - startSample) / (float)(endSample - startSample);
         //座標移動
         Vector3 newPos = Vector3.zero;
         newPos.x = MyMathf.LerpUnlimited(startPos.x, endPos.x, justTimePos);
@@ -36,7 +36,7 @@ public class Note : MonoBehaviour {
         transform.localScale = Vector3.one * newSize;
 
         //消滅
-        if(Music.MusicalTime > endTime + destroyPostponedTime)
+        if(Music.TimeSamples > endSample + destroyPostponedTime * Music.CurrentSource.clip.frequency)
         {
             Destroy(gameObject);
         }

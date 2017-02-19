@@ -56,11 +56,8 @@ public class ClickTapRelay : MonoBehaviour {
                         {
                             //Keyコンポーネントが付与されていればKeyとして認識
                             Key k = hit.collider.gameObject.GetComponent<Key>();
-                            if (k)
-                            {
-                                //該当するキーのTouched通知を行う
-                                k.KeyTouched();
-                            }
+                            //該当するキーのTouched通知を行う
+                            if (k) k.KeyTouched();
                         }
                     }
                 }

@@ -73,11 +73,15 @@ public class Key : MonoBehaviour {
         if (isAppliedKeyPushed) KeyPressed();
 
         //Notes出力関係
-        if (Music.IsJustChangedBar())
+        if (Music.IsJustChangedBeat())
         {
-            Timing newTime = new Timing(1);
-            newTime.Add(Music.Just, Music.CurrentSection);
-            CreateNote(newTime);
+            if(Music.Just.Beat == 2)
+            {
+                Timing newTime = new Timing(0, 2);
+                newTime.Add(Music.Just, Music.CurrentSection);
+                CreateNote(newTime);
+            }
+            
         }
 	}
 
@@ -101,6 +105,7 @@ public class Key : MonoBehaviour {
     void CreateNote(Timing beatTime)
     {
         GameObject newNoteObject = GameObject.Instantiate(NotePrefab);
+        newNoteObject.transform.localScale = Vector3.zero;  //一瞬チラつくのを抑制
         Note newNote = newNoteObject.GetComponent<Note>();
         if (newNote == null)
         {
@@ -109,9 +114,39 @@ public class Key : MonoBehaviour {
         }
         newNote.startPos = NoteStartPos;
         newNote.endPos = transform.position;
-        newNote.startTime = Music.MusicalTime;  //開始時刻は現在時刻
-        newNote.endTime = beatTime.GetMusicalTime(Music.CurrentSection);
+        newNote.startSample = Music.TimeSamples;
+        newNote.endSample = TimingToSample(beatTime);
         //StartSize、EndSizeはPrefabに紐付けられた情報のまま
+    }
+
+    /// <summary>
+    /// Timing型からtimeSamples(int)への変換
+    /// </summary>
+    /// <param name="t">Timing型変数</param>
+    /// <returns>timeSamples(int) エラーで-1</returns>
+    int TimingToSample(Timing t)
+    {
+        int i;
+
+        for(i=0; i<Music.SectionCount - 1; i++)
+        {
+            if(t.Bar < Music.GetSection(i + 1).StartBar)
+            {
+                break;
+            }
+        }
+
+        //セクション内のTimingのみを抽出
+        Timing sectionStart = new Timing(Music.GetSection(i).StartBar);
+        t.Subtract(sectionStart, Music.GetSection(i));
+        //セクション開始からのUnit数を計算
+        int totalUnitFromSectionStart = t.Bar * Music.GetSection(i).UnitPerBar + t.Beat * Music.GetSection(i).UnitPerBeat + t.Unit;
+        //セクション開始からのサンプル数を計算
+        int samplesFromSectionStart = (int)(totalUnitFromSectionStart * Music.CurrentSource.clip.frequency * 60 / (Music.GetSection(i).Tempo * Music.GetSection(i).UnitPerBeat));
+        //セクション開始時のサンプル数を加算
+        int samplesFromMusicStart = Music.GetSection(i).StartTimeSamples + samplesFromSectionStart;
+
+        return samplesFromMusicStart;
     }
 
     #endregion
